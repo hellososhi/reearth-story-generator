@@ -1,0 +1,7 @@
+id: story-generator
+name: Story Generator
+version: 1.0.0
+extensions:
+  - id: main-widget
+    type: widget
+    name: Test
