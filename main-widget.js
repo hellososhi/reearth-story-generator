@@ -14,6 +14,10 @@ reearth.ui.show(`
       padding: 12px;
       background: white;
     }
+    .api-key {
+      display: flex;
+      gap: 4px;
+    }
     #wrapper img {
       width: 100%;
       margin-top: 12px;
@@ -21,14 +25,21 @@ reearth.ui.show(`
   </style>
 
   <div id="wrapper">
-    <button id="button">Capture</button>
-    <p>Click this button will capture the map</p>
+    <div class="api-key">
+      <div>OpenAI API Key</div>
+      <input type="password" id="openai-api-key">
+    </div>
+    <button id="button">写真を撮る</button>
   </div>
 
   <script>
     document.getElementById("button").addEventListener("click", (e) => {
-      parent.postMessage({ type: "captureScreen" }, "*");
+      parent.postMessage({
+        type: "captureScreen",
+        openaiApiKey: document.getElementById("openai-api-key").value
+      }, "*");
     });
+
     addEventListener("message", e => {
       if (e.source !== parent) return;
       if (e.data.type && e.data.type === 'getCaptureScreen') {
