@@ -28,12 +28,9 @@ reearth.ui.show(`
     addEventListener("message", e => {
       if (e.source !== parent) return;
       if (e.data.type && e.data.type === 'getCaptureScreen') {
-        const fileName = "capture.png";
-        const link = document.createElement("a");
-        link.download = fileName;
-        link.href = e.data.payload;
-        link.click();
-        link.remove();
+        const img = document.createElement("img");
+        img.src = e.data.payload;
+        document.getElementById("wrapper").appendChild(img);
       }
     })
   </script>

@@ -4,4 +4,4 @@ version: 1.0.0
 extensions:
   - id: main-widget
     type: widget
-    name: Test
+    name: Story Generator
