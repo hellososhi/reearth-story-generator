@@ -1,8 +1,14 @@
+const promptText = `あなたはストーリーテラーです。これから画像が与えられます。その画像から想像できるストーリーを作ってください。
+以下のルールに従ってください:
+- 画像は複数回与えられるので、前のストーリーにつながるようにストーリーを続けてください。
+- 文章は一つの画像につき400文字以内にしてください。
+- 文章の装飾は使わず、プレーンテキストで出力してください。`
+
 reearth.ui.show(`
   <style>
     html,body {
       margin: 0;
-      width: 350px;
+      width: 400px;
     }
     button {
       margin: 0;
@@ -33,6 +39,8 @@ reearth.ui.show(`
       <div>OpenAI API Key</div>
       <input type="password" id="openai-api-key">
     </div>
+    <div>設定</div>
+    <textarea id="settings" rows="4" cols="40"></textarea>
     <button id="button">写真を撮る</button>
     <div id="stories"></div>
   </div>
@@ -53,6 +61,7 @@ reearth.ui.show(`
         const img = document.createElement("img");
         img.src = capturedImage;
         document.getElementById("stories").appendChild(img);
+        const settings = document.getElementById("settings").value;
         fetch("https://api.openai.com/v1/chat/completions", {
           method: "POST",
           headers: {
@@ -67,7 +76,9 @@ reearth.ui.show(`
                 "content": [
                   {
                     "type": "text",
-                    "text": "あなたはストーリーテラーです。これから画像が与えられます。その画像から想像できるストーリーを作ってください。画像は複数回与えられるので、前のストーリーにつながるようにストーリーを続けてください。文章は一つの画像につき400文字にしてください。文章の装飾は使わず、プレーンテキストで出力してください。"
+                    "text": \`${promptText}\` + (settings ? \`
+ストーリーの設定は以下の通りです：
+\` + settings : "")
                   },
                   ...stories.map(story => [
                     {
