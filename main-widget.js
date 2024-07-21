@@ -20,9 +20,11 @@ reearth.ui.show(`
       display: flex;
       gap: 4px;
     }
-    #wrapper img {
-      width: 100%;
+    #stories {
       margin-top: 12px;
+    }
+    #stories img {
+      width: 100%;
     }
   </style>
 
@@ -32,9 +34,12 @@ reearth.ui.show(`
       <input type="password" id="openai-api-key">
     </div>
     <button id="button">写真を撮る</button>
+    <div id="stories"></div>
   </div>
 
   <script>
+    const stories = [];
+
     document.getElementById("button").addEventListener("click", (e) => {
       parent.postMessage({
         type: "captureScreen",
@@ -47,7 +52,7 @@ reearth.ui.show(`
         const capturedImage = e.data.payload;
         const img = document.createElement("img");
         img.src = capturedImage;
-        document.getElementById("wrapper").appendChild(img);
+        document.getElementById("stories").appendChild(img);
         fetch("https://api.openai.com/v1/chat/completions", {
           method: "POST",
           headers: {
@@ -62,8 +67,20 @@ reearth.ui.show(`
                 "content": [
                   {
                     "type": "text",
-                    "text": "この画像について説明してください。"
+                    "text": "あなたはストーリーテラーです。これから画像が与えられます。その画像から想像できるストーリーを作ってください。画像は複数回与えられるので、前のストーリーにつながるようにストーリーを続けてください。文章は一つの画像につき400文字にしてください。文章の装飾は使わず、プレーンテキストで出力してください。"
                   },
+                  ...stories.map(story => [
+                    {
+                      "type": "image_url",
+                      "image_url": {
+                        "url": story.image
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "text": story.description
+                    }
+                  ]).flat(),
                   {
                     "type": "image_url",
                     "image_url": {
@@ -73,11 +90,15 @@ reearth.ui.show(`
                 ]
               }
             ],
-            "max_tokens": 300
+            "max_tokens": 600
           })
         }).then(res => res.json()).then((data) => {
           const response = data.choices[0].message.content;
-          document.getElementById("wrapper").appendChild(document.createTextNode(response));
+          document.getElementById("stories").appendChild(document.createTextNode(response));
+          stories.push({
+            image: capturedImage,
+            description: response,
+          });
         })
       }
     })
